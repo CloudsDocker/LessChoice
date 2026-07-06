@@ -1,0 +1,199 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 56;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		A1A1A1A10000000000000001 /* DecisionDeckApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1A1A1A10000000000000002 /* DecisionDeckApp.swift */; };
+		A1A1A1A10000000000000003 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1A1A1A10000000000000004 /* ContentView.swift */; };
+		A1A1A1A10000000000000005 /* DecisionModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1A1A1A10000000000000006 /* DecisionModel.swift */; };
+		A1A1A1A10000000000000019 /* Config.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1A1A1A10000000000000020 /* Config.swift */; };
+		A1A1A1A10000000000000021 /* GeminiService.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1A1A1A10000000000000022 /* GeminiService.swift */; };
+		A1A1A1A10000000000000023 /* PlacesService.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1A1A1A10000000000000024 /* PlacesService.swift */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXFileReference section */
+		A1A1A1A10000000000000002 /* DecisionDeckApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DecisionDeckApp.swift; sourceTree = "<group>"; };
+		A1A1A1A10000000000000004 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
+		A1A1A1A10000000000000006 /* DecisionModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DecisionModel.swift; sourceTree = "<group>"; };
+		A1A1A1A10000000000000007 /* DecisionDeck.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = DecisionDeck.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		A1A1A1A10000000000000020 /* Config.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Config.swift; sourceTree = "<group>"; };
+		A1A1A1A10000000000000022 /* GeminiService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GeminiService.swift; sourceTree = "<group>"; };
+		A1A1A1A10000000000000024 /* PlacesService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlacesService.swift; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		A1A1A1A10000000000000008 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		A1A1A1A10000000000000009 /* DecisionDeck */ = {
+			isa = PBXGroup;
+			children = (
+				A1A1A1A10000000000000002,
+				A1A1A1A10000000000000004,
+				A1A1A1A10000000000000006,
+				A1A1A1A10000000000000020,
+				A1A1A1A10000000000000022,
+				A1A1A1A10000000000000024,
+			);
+			path = DecisionDeck;
+			sourceTree = "<group>";
+		};
+		A1A1A1A10000000000000010 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				A1A1A1A10000000000000007,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		A1A1A1A10000000000000011 /* Project */ = {
+			isa = PBXGroup;
+			children = (
+				A1A1A1A10000000000000009,
+				A1A1A1A10000000000000010,
+			);
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		A1A1A1A10000000000000012 /* DecisionDeck */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = A1A1A1A10000000000000014 /* Build configuration list for PBXNativeTarget "DecisionDeck" */;
+			buildPhases = (
+				A1A1A1A10000000000000013 /* Sources */,
+				A1A1A1A10000000000000008 /* Frameworks */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = DecisionDeck;
+			productName = DecisionDeck;
+			productReference = A1A1A1A10000000000000007;
+			productType = "com.apple.product-type.application";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXSourcesBuildPhase section */
+		A1A1A1A10000000000000013 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				A1A1A1A10000000000000001,
+				A1A1A1A10000000000000003,
+				A1A1A1A10000000000000005,
+				A1A1A1A10000000000000019,
+				A1A1A1A10000000000000021,
+				A1A1A1A10000000000000023,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXProject section */
+		A1A1A1A10000000000000015 /* Project object */ = {
+			isa = PBXProject;
+			buildConfigurationList = A1A1A1A10000000000000016 /* Build configuration list for PBXProject "DecisionDeck" */;
+			compatibilityVersion = "Xcode 14.0";
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+			);
+			mainGroup = A1A1A1A10000000000000011;
+			productRefGroup = A1A1A1A10000000000000010;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				A1A1A1A10000000000000012,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin XCBuildConfiguration section */
+		A1A1A1A10000000000000017 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
+				CLANG_ENABLE_MODULES = YES;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
+				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.example.DecisionDeck;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.9;
+				TARGETED_DEVICE_FAMILY = 1;
+			};
+			name = Debug;
+		};
+		A1A1A1A10000000000000018 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
+				CLANG_ENABLE_MODULES = YES;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
+				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.example.DecisionDeck;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.9;
+				TARGETED_DEVICE_FAMILY = 1;
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		A1A1A1A10000000000000014 /* Build configuration list for PBXNativeTarget "DecisionDeck" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				A1A1A1A10000000000000017,
+				A1A1A1A10000000000000018,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		A1A1A1A10000000000000016 /* Build configuration list for PBXProject "DecisionDeck" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				A1A1A1A10000000000000017,
+				A1A1A1A10000000000000018,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+
+	};
+	rootObject = A1A1A1A10000000000000015;
+}
