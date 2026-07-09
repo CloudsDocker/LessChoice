@@ -31,13 +31,16 @@ enum GeminiService {
         [{"title": "Place Name", "subtitle": "short tagline", "description": "one engaging sentence under 140 characters", "category": "one or two words"}]
         """
 
-        var request = URLRequest(url: URL(string: "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=\(Config.geminiAPIKey)")!)
+        var request = URLRequest(url: URL(string: "https://generativelanguage.googleapis.com/v1beta/models/gemini-flash-latest:generateContent?key=\(Config.geminiAPIKey)")!)
         request.httpMethod = "POST"
         request.setValue("application/json", forHTTPHeaderField: "Content-Type")
 
         let body: [String: Any] = [
             "contents": [["parts": [["text": instructions]]]],
-            "generationConfig": ["response_mime_type": "application/json"]
+            "generationConfig": [
+                "response_mime_type": "application/json",
+                "thinkingConfig": ["thinkingBudget": 0]
+            ]
         ]
         request.httpBody = try JSONSerialization.data(withJSONObject: body)
 

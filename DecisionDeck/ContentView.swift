@@ -175,13 +175,17 @@ struct PlaceCard: View {
             RoundedRectangle(cornerRadius: 24, style: .continuous)
                 .fill(LinearGradient(colors: [.indigo, .cyan], startPoint: .topLeading, endPoint: .bottomTrailing))
             if let imageURL = option.imageURL {
-                AsyncImage(url: imageURL) { phase in
-                    if let image = phase.image {
-                        image
-                            .resizable()
-                            .aspectRatio(contentMode: .fill)
-                    } else {
-                        Color.clear
+                GeometryReader { geometry in
+                    AsyncImage(url: imageURL) { phase in
+                        if let image = phase.image {
+                            image
+                                .resizable()
+                                .aspectRatio(contentMode: .fill)
+                                .frame(width: geometry.size.width, height: geometry.size.height)
+                                .clipped()
+                        } else {
+                            Color.clear
+                        }
                     }
                 }
             }
@@ -209,7 +213,7 @@ struct PlaceCard: View {
             .padding(24)
             .frame(maxWidth: .infinity, alignment: .leading)
         }
-        .frame(minHeight: 380)
+        .frame(maxWidth: .infinity, minHeight: 380)
         .clipShape(RoundedRectangle(cornerRadius: 24, style: .continuous))
     }
 }
