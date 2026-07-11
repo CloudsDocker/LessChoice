@@ -41,13 +41,13 @@
 		A1A1A1A10000000000000009 /* DecisionDeck */ = {
 			isa = PBXGroup;
 			children = (
-				A1A1A1A10000000000000002,
-				A1A1A1A10000000000000004,
-				A1A1A1A10000000000000006,
-				A1A1A1A10000000000000020,
-				A1A1A1A10000000000000022,
-				A1A1A1A10000000000000024,
-				A1A1A1A10000000000000025,
+				A1A1A1A10000000000000002 /* DecisionDeckApp.swift */,
+				A1A1A1A10000000000000004 /* ContentView.swift */,
+				A1A1A1A10000000000000006 /* DecisionModel.swift */,
+				A1A1A1A10000000000000020 /* Config.swift */,
+				A1A1A1A10000000000000022 /* GeminiService.swift */,
+				A1A1A1A10000000000000024 /* PlacesService.swift */,
+				A1A1A1A10000000000000025 /* Assets.xcassets */,
 			);
 			path = DecisionDeck;
 			sourceTree = "<group>";
@@ -55,16 +55,16 @@
 		A1A1A1A10000000000000010 /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				A1A1A1A10000000000000007,
+				A1A1A1A10000000000000007 /* DecisionDeck.app */,
 			);
 			name = Products;
 			sourceTree = "<group>";
 		};
-		A1A1A1A10000000000000011 /* Project */ = {
+		A1A1A1A10000000000000011 = {
 			isa = PBXGroup;
 			children = (
-				A1A1A1A10000000000000009,
-				A1A1A1A10000000000000010,
+				A1A1A1A10000000000000009 /* DecisionDeck */,
+				A1A1A1A10000000000000010 /* Products */,
 			);
 			sourceTree = "<group>";
 		};
@@ -85,26 +85,32 @@
 			);
 			name = DecisionDeck;
 			productName = DecisionDeck;
-			productReference = A1A1A1A10000000000000007;
+			productReference = A1A1A1A10000000000000007 /* DecisionDeck.app */;
 			productType = "com.apple.product-type.application";
 		};
 /* End PBXNativeTarget section */
 
-/* Begin PBXSourcesBuildPhase section */
-		A1A1A1A10000000000000013 /* Sources */ = {
-			isa = PBXSourcesBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-				A1A1A1A10000000000000001,
-				A1A1A1A10000000000000003,
-				A1A1A1A10000000000000005,
-				A1A1A1A10000000000000019,
-				A1A1A1A10000000000000021,
-				A1A1A1A10000000000000023,
+/* Begin PBXProject section */
+		A1A1A1A10000000000000015 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+			};
+			buildConfigurationList = A1A1A1A10000000000000016 /* Build configuration list for PBXProject "DecisionDeck" */;
+			compatibilityVersion = "Xcode 14.0";
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
 			);
-			runOnlyForDeploymentPostprocessing = 0;
+			mainGroup = A1A1A1A10000000000000011;
+			productRefGroup = A1A1A1A10000000000000010 /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				A1A1A1A10000000000000012 /* DecisionDeck */,
+			);
 		};
-/* End PBXSourcesBuildPhase section */
+/* End PBXProject section */
 
 /* Begin PBXResourcesBuildPhase section */
 		A1A1A1A10000000000000027 /* Resources */ = {
@@ -117,25 +123,21 @@
 		};
 /* End PBXResourcesBuildPhase section */
 
-/* Begin PBXProject section */
-		A1A1A1A10000000000000015 /* Project object */ = {
-			isa = PBXProject;
-			buildConfigurationList = A1A1A1A10000000000000016 /* Build configuration list for PBXProject "DecisionDeck" */;
-			compatibilityVersion = "Xcode 14.0";
-			developmentRegion = en;
-			hasScannedForEncodings = 0;
-			knownRegions = (
-				en,
+/* Begin PBXSourcesBuildPhase section */
+		A1A1A1A10000000000000013 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				A1A1A1A10000000000000001 /* DecisionDeckApp.swift in Sources */,
+				A1A1A1A10000000000000003 /* ContentView.swift in Sources */,
+				A1A1A1A10000000000000005 /* DecisionModel.swift in Sources */,
+				A1A1A1A10000000000000019 /* Config.swift in Sources */,
+				A1A1A1A10000000000000021 /* GeminiService.swift in Sources */,
+				A1A1A1A10000000000000023 /* PlacesService.swift in Sources */,
 			);
-			mainGroup = A1A1A1A10000000000000011;
-			productRefGroup = A1A1A1A10000000000000010;
-			projectDirPath = "";
-			projectRoot = "";
-			targets = (
-				A1A1A1A10000000000000012,
-			);
+			runOnlyForDeploymentPostprocessing = 0;
 		};
-/* End PBXProject section */
+/* End PBXSourcesBuildPhase section */
 
 /* Begin XCBuildConfiguration section */
 		A1A1A1A10000000000000017 /* Debug */ = {
@@ -146,13 +148,17 @@
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = ZLQUC8CBXW;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
 				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
-				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
 				MARKETING_VERSION = 1.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.hdeazy.lesschoice;
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -171,13 +177,17 @@
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = ZLQUC8CBXW;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
 				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
-				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
 				MARKETING_VERSION = 1.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.hdeazy.lesschoice;
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -194,8 +204,8 @@
 		A1A1A1A10000000000000014 /* Build configuration list for PBXNativeTarget "DecisionDeck" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
-				A1A1A1A10000000000000017,
-				A1A1A1A10000000000000018,
+				A1A1A1A10000000000000017 /* Debug */,
+				A1A1A1A10000000000000018 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
@@ -203,14 +213,13 @@
 		A1A1A1A10000000000000016 /* Build configuration list for PBXProject "DecisionDeck" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
-				A1A1A1A10000000000000017,
-				A1A1A1A10000000000000018,
+				A1A1A1A10000000000000017 /* Debug */,
+				A1A1A1A10000000000000018 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
-
 	};
-	rootObject = A1A1A1A10000000000000015;
+	rootObject = A1A1A1A10000000000000015 /* Project object */;
 }

@@ -1,5 +1,84 @@
 import SwiftUI
 
+/// Slowly-morphing colorful gradient, like Gemini's ambient background. Intensifies while `isBusy` is true.
+struct AnimatedGradientBackground: View {
+    var isBusy: Bool = false
+
+    private let palettes: [[Color]] = [
+        [Color(red: 0.42, green: 0.35, blue: 0.95), Color(red: 0.98, green: 0.45, blue: 0.62), Color(red: 0.31, green: 0.73, blue: 0.96)],
+        [Color(red: 0.98, green: 0.55, blue: 0.32), Color(red: 0.55, green: 0.32, blue: 0.94), Color(red: 0.31, green: 0.85, blue: 0.72)],
+        [Color(red: 0.31, green: 0.61, blue: 0.98), Color(red: 0.85, green: 0.36, blue: 0.86), Color(red: 0.98, green: 0.72, blue: 0.34)],
+        [Color(red: 0.36, green: 0.85, blue: 0.62), Color(red: 0.35, green: 0.42, blue: 0.95), Color(red: 0.95, green: 0.45, blue: 0.45)],
+    ]
+
+    @State private var paletteIndex = 0
+
+    var body: some View {
+        TimelineView(.animation(minimumInterval: isBusy ? 1 / 30 : 1 / 12)) { timeline in
+            let t = timeline.date.timeIntervalSinceReferenceDate
+            let speed = isBusy ? 0.35 : 0.12
+            let angle = Angle(degrees: t * speed * 40)
+
+            LinearGradient(
+                colors: palettes[paletteIndex],
+                startPoint: UnitPoint(x: 0.5 + 0.5 * cos(angle.radians), y: 0.5 + 0.5 * sin(angle.radians)),
+                endPoint: UnitPoint(x: 0.5 - 0.5 * cos(angle.radians), y: 0.5 - 0.5 * sin(angle.radians))
+            )
+            .hueRotation(.degrees(isBusy ? sin(t * 0.6) * 20 : sin(t * 0.15) * 8))
+            .saturation(0.9)
+            .ignoresSafeArea()
+        }
+        .onAppear { schedulePaletteCycle() }
+    }
+
+    private func schedulePaletteCycle() {
+        let interval = isBusy ? 3.5 : 7.0
+        DispatchQueue.main.asyncAfter(deadline: .now() + interval) {
+            withAnimation(.easeInOut(duration: 2.5)) {
+                paletteIndex = (paletteIndex + 1) % palettes.count
+            }
+            schedulePaletteCycle()
+        }
+    }
+}
+
+struct AboutView: View {
+    @Environment(\.dismiss) private var dismiss
+
+    var body: some View {
+        NavigationStack {
+            VStack(spacing: 16) {
+                Image(systemName: "sparkles")
+                    .font(.system(size: 40))
+                    .foregroundStyle(Color.accentColor)
+                Text("DecisionDeck")
+                    .font(.title2.bold())
+                VStack(spacing: 6) {
+                    Text("Todd Zhang")
+                        .font(.headline)
+                    Text("phray.zhang@gmail.com")
+                        .font(.subheadline)
+                        .foregroundStyle(.secondary)
+                    Link("hdeazy.com", destination: URL(string: "https://www.hdeazy.com/")!)
+                        .font(.subheadline)
+                }
+                Spacer()
+            }
+            .padding(.top, 40)
+            .padding()
+            .navigationTitle("About")
+            #if os(iOS)
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                ToolbarItem(placement: .navigationBarTrailing) {
+                    Button("Done") { dismiss() }
+                }
+            }
+            #endif
+        }
+    }
+}
+
 struct ContentView: View {
     @StateObject private var store = DecisionSessionStore()
 
@@ -16,30 +95,44 @@ struct ContentView: View {
 
 struct SetupView: View {
     @ObservedObject var store: DecisionSessionStore
+    @State private var showAbout = false
 
     var body: some View {
-        ScrollView {
+        ZStack {
+            AnimatedGradientBackground()
+
+            ScrollView {
             VStack(alignment: .leading, spacing: 20) {
                 VStack(alignment: .leading, spacing: 8) {
                     Text("DecisionDeck")
                         .font(.largeTitle.bold())
+                        .foregroundStyle(.white)
                     Text("Turn vague choices into a calm, guided shortlist.")
                         .font(.subheadline)
-                        .foregroundStyle(.secondary)
+                        .foregroundStyle(.white.opacity(0.85))
                 }
+                .padding(.top, 12)
 
                 VStack(alignment: .leading, spacing: 8) {
                     Text("What are you deciding?")
                         .font(.headline)
+                        .foregroundStyle(.white)
                     TextField("Example: Kuala Lumpur from Sydney, 3 days, food and skyline", text: $store.prompt)
-                        .textFieldStyle(.roundedBorder)
+                        .textFieldStyle(.plain)
+                        .padding(12)
+                        .background(.white.opacity(0.92))
+                        .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
                 }
 
                 VStack(alignment: .leading, spacing: 8) {
                     Text("Constraints")
                         .font(.headline)
+                        .foregroundStyle(.white)
                     TextField("Budget, travel time, weather, family friendly", text: $store.constraints)
-                        .textFieldStyle(.roundedBorder)
+                        .textFieldStyle(.plain)
+                        .padding(12)
+                        .background(.white.opacity(0.92))
+                        .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
                 }
 
                 Button {
@@ -48,8 +141,8 @@ struct SetupView: View {
                     Label("Start decision flow", systemImage: "sparkles")
                         .frame(maxWidth: .infinity)
                         .padding()
-                        .background(Color.accentColor)
-                        .foregroundStyle(.white)
+                        .background(.white.opacity(0.95))
+                        .foregroundStyle(.black)
                         .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
                 }
 
@@ -61,23 +154,39 @@ struct SetupView: View {
                     Label("Load sample trip idea", systemImage: "airplane")
                         .frame(maxWidth: .infinity)
                         .padding()
+                        .foregroundStyle(.white)
                         .overlay(
                             RoundedRectangle(cornerRadius: 16, style: .continuous)
-                                .stroke(Color.secondary.opacity(0.3), lineWidth: 1)
+                                .stroke(.white.opacity(0.6), lineWidth: 1)
                         )
                 }
 
                 VStack(alignment: .leading, spacing: 6) {
                     Text("How it works")
                         .font(.headline)
+                        .foregroundStyle(.white)
                     Text("1. Add your decision context.\n2. Review each option as a card.\n3. Keep the ones that feel right and discard the rest.\n4. Finish with a focused shortlist.")
                         .font(.subheadline)
-                        .foregroundStyle(.secondary)
+                        .foregroundStyle(.white.opacity(0.85))
                 }
+
+                Button {
+                    showAbout = true
+                } label: {
+                    Text("About")
+                        .font(.footnote)
+                        .foregroundStyle(.white.opacity(0.75))
+                        .underline()
+                }
+                .frame(maxWidth: .infinity)
+                .padding(.top, 8)
             }
             .padding()
+            }
         }
-        .navigationTitle("DecisionDeck")
+        .sheet(isPresented: $showAbout) {
+            AboutView()
+        }
     }
 }
 
@@ -87,6 +196,11 @@ struct DecisionCardView: View {
     @State private var showShortlist = false
 
     var body: some View {
+        ZStack {
+            if session.currentOption == nil {
+                AnimatedGradientBackground(isBusy: true)
+            }
+
         VStack(spacing: 20) {
             HStack {
                 VStack(alignment: .leading, spacing: 4) {
@@ -163,6 +277,7 @@ struct DecisionCardView: View {
         }
         .sheet(isPresented: $showShortlist) {
             ShortlistView(kept: session.kept)
+        }
         }
     }
 }
