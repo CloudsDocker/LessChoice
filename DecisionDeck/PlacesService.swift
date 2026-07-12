@@ -13,6 +13,11 @@ enum PlacesService {
         ]
         var request = URLRequest(url: components.url!)
         request.setValue(Config.appSharedSecret, forHTTPHeaderField: "x-app-secret")
+        if let attestHeaders = await AppAttestService.assertionHeaders() {
+            for (field, value) in attestHeaders {
+                request.setValue(value, forHTTPHeaderField: field)
+            }
+        }
 
         guard let (data, response) = try? await BackendClient.dataWithColdStartRetry(for: request),
               let http = response as? HTTPURLResponse, http.statusCode == 200,

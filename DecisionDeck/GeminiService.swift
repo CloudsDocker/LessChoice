@@ -33,6 +33,11 @@ enum GeminiService {
         request.httpMethod = "POST"
         request.setValue("application/json", forHTTPHeaderField: "Content-Type")
         request.setValue(Config.appSharedSecret, forHTTPHeaderField: "x-app-secret")
+        if let attestHeaders = await AppAttestService.assertionHeaders() {
+            for (field, value) in attestHeaders {
+                request.setValue(value, forHTTPHeaderField: field)
+            }
+        }
 
         let body = SuggestionsRequestBody(prompt: prompt,
                                           constraints: constraints,
