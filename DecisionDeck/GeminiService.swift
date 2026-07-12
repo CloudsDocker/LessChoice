@@ -42,7 +42,7 @@ enum GeminiService {
                                           count: count)
         request.httpBody = try JSONEncoder().encode(body)
 
-        let (data, response) = try await URLSession.shared.data(for: request)
+        let (data, response) = try await BackendClient.dataWithColdStartRetry(for: request)
         guard let http = response as? HTTPURLResponse, http.statusCode == 200 else {
             throw GeminiServiceError.badResponse
         }

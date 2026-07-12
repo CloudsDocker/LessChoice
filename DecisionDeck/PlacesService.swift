@@ -14,7 +14,7 @@ enum PlacesService {
         var request = URLRequest(url: components.url!)
         request.setValue(Config.appSharedSecret, forHTTPHeaderField: "x-app-secret")
 
-        guard let (data, response) = try? await URLSession.shared.data(for: request),
+        guard let (data, response) = try? await BackendClient.dataWithColdStartRetry(for: request),
               let http = response as? HTTPURLResponse, http.statusCode == 200,
               let decoded = try? JSONDecoder().decode(PlacePhotoResponse.self, from: data),
               let photoPath = decoded.photoUrl else {
