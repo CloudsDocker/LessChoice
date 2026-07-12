@@ -5,6 +5,8 @@ struct SuggestedPlace: Decodable {
     let subtitle: String
     let description: String
     let category: String
+    let localTitle: String?
+    let localDescription: String?
 }
 
 enum GeminiServiceError: Error {
@@ -27,8 +29,9 @@ enum GeminiService {
         \(likedTitles.isEmpty ? "" : "The user liked these places, favor a similar style/category/vibe: \(likedTitles.joined(separator: ", ")).")
         \(blacklistedTitles.isEmpty ? "" : "The user disliked these places, avoid them and anything similar in style or category: \(blacklistedTitles.joined(separator: ", ")).")
         \(alreadySuggestedTitles.isEmpty ? "" : "Do not repeat any of these already-suggested places: \(alreadySuggestedTitles.joined(separator: ", ")).")
+        For each place, also give the name and a short description in the primary local/native language spoken where that place is located (e.g. for Shanghai, localTitle would be in Chinese characters). If the local language is English, leave localTitle and localDescription as empty strings.
         Respond with ONLY a JSON array, no markdown fences, in this exact shape:
-        [{"title": "Place Name", "subtitle": "short tagline", "description": "one engaging sentence under 140 characters", "category": "one or two words"}]
+        [{"title": "Place Name", "subtitle": "short tagline", "description": "one engaging sentence under 140 characters", "category": "one or two words", "localTitle": "Place name in the local language, or empty string", "localDescription": "one short sentence in the local language, or empty string"}]
         """
 
         var request = URLRequest(url: URL(string: "https://generativelanguage.googleapis.com/v1beta/models/gemini-flash-latest:generateContent?key=\(Config.geminiAPIKey)")!)

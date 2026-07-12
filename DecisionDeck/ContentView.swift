@@ -1,4 +1,30 @@
 import SwiftUI
+import UIKit
+
+/// Text field styled for high contrast against the animated gradient background, with a lively focus glow.
+struct VividTextField: View {
+    let placeholder: String
+    @Binding var text: String
+    @FocusState.Binding var isFocused: Bool
+
+    var body: some View {
+        TextField("", text: $text, prompt: Text(placeholder).foregroundColor(.black.opacity(0.4)))
+            .focused($isFocused)
+            .textFieldStyle(.plain)
+            .foregroundColor(.black)
+            .tint(.indigo)
+            .padding(14)
+            .background(Color.white)
+            .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
+            .overlay(
+                RoundedRectangle(cornerRadius: 12, style: .continuous)
+                    .stroke(isFocused ? Color.yellow : Color.white.opacity(0.9), lineWidth: isFocused ? 3 : 1.5)
+            )
+            .shadow(color: isFocused ? .yellow.opacity(0.5) : .black.opacity(0.15), radius: isFocused ? 10 : 4)
+            .scaleEffect(isFocused ? 1.02 : 1.0)
+            .animation(.spring(response: 0.3, dampingFraction: 0.6), value: isFocused)
+    }
+}
 
 /// Slowly-morphing colorful gradient, like Gemini's ambient background. Intensifies while `isBusy` is true.
 struct AnimatedGradientBackground: View {
@@ -96,6 +122,8 @@ struct ContentView: View {
 struct SetupView: View {
     @ObservedObject var store: DecisionSessionStore
     @State private var showAbout = false
+    @FocusState private var promptFocused: Bool
+    @FocusState private var constraintsFocused: Bool
 
     var body: some View {
         ZStack {
@@ -117,22 +145,18 @@ struct SetupView: View {
                     Text("What are you deciding?")
                         .font(.headline)
                         .foregroundStyle(.white)
-                    TextField("Example: Kuala Lumpur from Sydney, 3 days, food and skyline", text: $store.prompt)
-                        .textFieldStyle(.plain)
-                        .padding(12)
-                        .background(.white.opacity(0.92))
-                        .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
+                    VividTextField(placeholder: "Example: Kuala Lumpur from Sydney, 3 days, food and skyline",
+                                   text: $store.prompt,
+                                   isFocused: $promptFocused)
                 }
 
                 VStack(alignment: .leading, spacing: 8) {
                     Text("Constraints")
                         .font(.headline)
                         .foregroundStyle(.white)
-                    TextField("Budget, travel time, weather, family friendly", text: $store.constraints)
-                        .textFieldStyle(.plain)
-                        .padding(12)
-                        .background(.white.opacity(0.92))
-                        .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
+                    VividTextField(placeholder: "Budget, travel time, weather, family friendly",
+                                   text: $store.constraints,
+                                   isFocused: $constraintsFocused)
                 }
 
                 Button {
@@ -211,7 +235,7 @@ struct DecisionCardView: View {
                         .foregroundStyle(.secondary)
                 }
                 Spacer()
-                Text("\(session.kept.count) kept")
+                Text("\(session.kept.count) kept · \(session.maybe.count) maybe")
                     .font(.caption.bold())
                     .foregroundStyle(.secondary)
             }
@@ -220,11 +244,11 @@ struct DecisionCardView: View {
                 VStack(spacing: 18) {
                     PlaceCard(option: option)
 
-                    HStack(spacing: 14) {
+                    HStack(spacing: 10) {
                         Button {
                             store.makeChoice(.discard)
                         } label: {
-                            Label("Discard", systemImage: "xmark")
+                            Label("No", systemImage: "xmark")
                                 .frame(maxWidth: .infinity)
                                 .padding()
                                 .background(Color.red.opacity(0.14))
@@ -233,9 +257,20 @@ struct DecisionCardView: View {
                         }
 
                         Button {
+                            store.makeChoice(.maybe)
+                        } label: {
+                            Label("Maybe", systemImage: "questionmark")
+                                .frame(maxWidth: .infinity)
+                                .padding()
+                                .background(Color.orange.opacity(0.16))
+                                .foregroundStyle(.orange)
+                                .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
+                        }
+
+                        Button {
                             store.makeChoice(.keep)
                         } label: {
-                            Label("Keep", systemImage: "checkmark")
+                            Label("Yes", systemImage: "checkmark")
                                 .frame(maxWidth: .infinity)
                                 .padding()
                                 .background(Color.green.opacity(0.16))
@@ -276,7 +311,7 @@ struct DecisionCardView: View {
             #endif
         }
         .sheet(isPresented: $showShortlist) {
-            ShortlistView(kept: session.kept)
+            ShortlistView(kept: session.kept, maybe: session.maybe)
         }
         }
     }
@@ -317,6 +352,11 @@ struct PlaceCard: View {
                 Text(option.title)
                     .font(.title.bold())
                     .foregroundStyle(.white)
+                if let localTitle = option.localTitle {
+                    Text(localTitle)
+                        .font(.title3.bold())
+                        .foregroundStyle(.white.opacity(0.85))
+                }
                 Text(option.subtitle)
                     .font(.headline)
                     .foregroundStyle(.white.opacity(0.9))
@@ -324,6 +364,12 @@ struct PlaceCard: View {
                     .font(.subheadline)
                     .foregroundStyle(.white.opacity(0.93))
                     .lineLimit(4, reservesSpace: true)
+                if let localDescription = option.localDescription {
+                    Text(localDescription)
+                        .font(.subheadline)
+                        .foregroundStyle(.white.opacity(0.8))
+                        .lineLimit(3, reservesSpace: true)
+                }
             }
             .padding(24)
             .frame(maxWidth: .infinity, alignment: .leading)
@@ -333,38 +379,183 @@ struct PlaceCard: View {
     }
 }
 
-struct ShortlistView: View {
+/// Wraps UIActivityViewController so the shortlist can be shared to Mail, WhatsApp, Messages, etc.
+struct ActivityShareSheet: UIViewControllerRepresentable {
+    let items: [Any]
+
+    func makeUIViewController(context: Context) -> UIActivityViewController {
+        UIActivityViewController(activityItems: items, applicationActivities: nil)
+    }
+
+    func updateUIViewController(_ uiViewController: UIActivityViewController, context: Context) {}
+}
+
+/// The printable/exportable layout used both on-screen and when rendered to an image or PDF.
+struct ShortlistExportView: View {
     let kept: [DecisionOption]
-    @Environment(\.dismiss) private var dismiss
+    let maybe: [DecisionOption]
 
     var body: some View {
-        NavigationStack {
-            List {
-                if kept.isEmpty {
-                    Text("Keep some places to build your shortlist.")
-                        .foregroundStyle(.secondary)
-                } else {
-                    ForEach(kept) { option in
-                        VStack(alignment: .leading, spacing: 4) {
-                            Text(option.title)
-                                .font(.headline)
-                            Text(option.description)
+        VStack(alignment: .leading, spacing: 20) {
+            Text("DecisionDeck Shortlist")
+                .font(.title.bold())
+
+            if !kept.isEmpty {
+                shortlistSection(title: "Kept", options: kept, color: .green)
+            }
+            if !maybe.isEmpty {
+                shortlistSection(title: "Maybe", options: maybe, color: .orange)
+            }
+            if kept.isEmpty && maybe.isEmpty {
+                Text("Keep some places to build your shortlist.")
+                    .foregroundStyle(.secondary)
+            }
+        }
+        .padding(24)
+        .background(Color.white)
+    }
+
+    private func shortlistSection(title: String, options: [DecisionOption], color: Color) -> some View {
+        VStack(alignment: .leading, spacing: 12) {
+            Text(title)
+                .font(.headline)
+                .foregroundStyle(color)
+            ForEach(options) { option in
+                VStack(alignment: .leading, spacing: 4) {
+                    HStack(alignment: .firstTextBaseline, spacing: 6) {
+                        Text(option.title)
+                            .font(.headline)
+                        if let localTitle = option.localTitle {
+                            Text(localTitle)
                                 .font(.subheadline)
                                 .foregroundStyle(.secondary)
                         }
                     }
+                    Text(option.description)
+                        .font(.subheadline)
+                        .foregroundStyle(.secondary)
+                }
+            }
+        }
+    }
+}
+
+struct ShortlistView: View {
+    let kept: [DecisionOption]
+    let maybe: [DecisionOption]
+    @Environment(\.dismiss) private var dismiss
+    @Environment(\.displayScale) private var displayScale
+    @State private var shareItems: [Any]?
+    @State private var savedMessage: String?
+
+    var body: some View {
+        NavigationStack {
+            List {
+                if !kept.isEmpty {
+                    Section("Kept") {
+                        rows(for: kept)
+                    }
+                }
+                if !maybe.isEmpty {
+                    Section("Maybe") {
+                        rows(for: maybe)
+                    }
+                }
+                if kept.isEmpty && maybe.isEmpty {
+                    Text("Keep some places to build your shortlist.")
+                        .foregroundStyle(.secondary)
+                }
+                if let savedMessage {
+                    Text(savedMessage)
+                        .font(.footnote)
+                        .foregroundStyle(.secondary)
                 }
             }
             .navigationTitle("Shortlist")
             #if os(iOS)
             .toolbar {
-                ToolbarItem(placement: .navigationBarTrailing) {
+                ToolbarItem(placement: .navigationBarLeading) {
                     Button("Done") { dismiss() }
                 }
+                ToolbarItemGroup(placement: .navigationBarTrailing) {
+                    Button {
+                        saveImageToPhotos()
+                    } label: {
+                        Image(systemName: "square.and.arrow.down")
+                    }
+                    .disabled(kept.isEmpty && maybe.isEmpty)
+
+                    Button {
+                        shareAsPDF()
+                    } label: {
+                        Image(systemName: "square.and.arrow.up")
+                    }
+                    .disabled(kept.isEmpty && maybe.isEmpty)
+                }
+            }
+            .sheet(item: Binding(
+                get: { shareItems.map(ShareItemsBox.init) },
+                set: { shareItems = $0?.items }
+            )) { box in
+                ActivityShareSheet(items: box.items)
             }
             #endif
         }
     }
+
+    private func rows(for options: [DecisionOption]) -> some View {
+        ForEach(options) { option in
+            VStack(alignment: .leading, spacing: 4) {
+                HStack(alignment: .firstTextBaseline, spacing: 6) {
+                    Text(option.title)
+                        .font(.headline)
+                    if let localTitle = option.localTitle {
+                        Text(localTitle)
+                            .font(.subheadline)
+                            .foregroundStyle(.secondary)
+                    }
+                }
+                Text(option.description)
+                    .font(.subheadline)
+                    .foregroundStyle(.secondary)
+            }
+        }
+    }
+
+    @MainActor
+    private func renderedImage() -> UIImage? {
+        let renderer = ImageRenderer(content: ShortlistExportView(kept: kept, maybe: maybe))
+        renderer.scale = displayScale
+        return renderer.uiImage
+    }
+
+    @MainActor
+    private func saveImageToPhotos() {
+        guard let image = renderedImage() else { return }
+        UIImageWriteToSavedPhotosAlbum(image, nil, nil, nil)
+        savedMessage = "Saved to Photos."
+    }
+
+    @MainActor
+    private func shareAsPDF() {
+        let renderer = ImageRenderer(content: ShortlistExportView(kept: kept, maybe: maybe))
+        renderer.scale = displayScale
+        let url = FileManager.default.temporaryDirectory.appendingPathComponent("DecisionDeck-Shortlist.pdf")
+        renderer.render { size, context in
+            var box = CGRect(origin: .zero, size: size)
+            guard let pdf = CGContext(url as CFURL, mediaBox: &box, nil) else { return }
+            pdf.beginPDFPage(nil)
+            context(pdf)
+            pdf.endPDFPage()
+            pdf.closePDF()
+        }
+        shareItems = [url]
+    }
+}
+
+private struct ShareItemsBox: Identifiable {
+    let id = UUID()
+    let items: [Any]
 }
 
 struct ContentView_Previews: PreviewProvider {

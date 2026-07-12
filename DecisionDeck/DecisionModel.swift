@@ -7,10 +7,12 @@ struct DecisionOption: Identifiable, Equatable {
     let description: String
     let category: String
     var imageURL: URL?
+    var localTitle: String?
+    var localDescription: String?
 }
 
 enum DecisionChoice: String {
-    case keep, discard
+    case keep, maybe, discard
 }
 
 struct DecisionSession {
@@ -18,6 +20,7 @@ struct DecisionSession {
     let constraints: String
     var options: [DecisionOption]
     var kept: [DecisionOption]
+    var maybe: [DecisionOption]
     var discarded: [DecisionOption]
     var currentIndex: Int
 
@@ -53,6 +56,7 @@ final class DecisionSessionStore: ObservableObject {
                                   constraints: finalConstraints,
                                   options: [],
                                   kept: [],
+                                  maybe: [],
                                   discarded: [],
                                   currentIndex: 0)
         statusMessage = "Finding options for you..."
@@ -63,16 +67,26 @@ final class DecisionSessionStore: ObservableObject {
         guard var currentSession = session else { return }
 
         if let currentOption = currentSession.currentOption {
-            if choice == .keep {
+            switch choice {
+            case .keep:
                 currentSession.kept.append(currentOption)
-            } else {
+            case .maybe:
+                currentSession.maybe.append(currentOption)
+            case .discard:
                 currentSession.discarded.append(currentOption)
             }
         }
 
         currentSession.currentIndex += 1
         session = currentSession
-        statusMessage = choice == .keep ? "Kept. Finding more like this." : "Removed. Steering away from that."
+        switch choice {
+        case .keep:
+            statusMessage = "Kept. Finding more like this."
+        case .maybe:
+            statusMessage = "Saved as maybe. Still deciding."
+        case .discard:
+            statusMessage = "Removed. Steering away from that."
+        }
 
         if currentSession.options.count - currentSession.currentIndex <= refillThreshold {
             loadMore()
@@ -121,7 +135,9 @@ final class DecisionSessionStore: ObservableObject {
                                                       subtitle: suggestion.subtitle,
                                                       description: suggestion.description,
                                                       category: suggestion.category,
-                                                      imageURL: imageURL))
+                                                      imageURL: imageURL,
+                                                      localTitle: suggestion.localTitle?.isEmpty == false ? suggestion.localTitle : nil,
+                                                      localDescription: suggestion.localDescription?.isEmpty == false ? suggestion.localDescription : nil))
                 }
 
                 guard var updatedSession = self.session else { return }
