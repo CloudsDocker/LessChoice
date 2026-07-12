@@ -1,61 +1,26 @@
 import Foundation
 
-actor PlacesPhotoCache {
-    static let shared = PlacesPhotoCache()
-    private var cache: [String: URL?] = [:]
-
-    func cachedURL(for key: String) -> URL?? {
-        cache[key]
-    }
-
-    func store(_ url: URL?, for key: String) {
-        cache[key] = url
-    }
+private struct PlacePhotoResponse: Decodable {
+    let photoUrl: String?
 }
 
 enum PlacesService {
     static func photoURL(forPlace title: String, context: String) async -> URL? {
-        let cacheKey = "\(title.lowercased())|\(context.lowercased())"
-        if let cached = await PlacesPhotoCache.shared.cachedURL(for: cacheKey) {
-            return cached
-        }
+        var components = URLComponents(string: "\(Config.backendBaseURL)/v1/place-photo")!
+        components.queryItems = [
+            URLQueryItem(name: "title", value: title),
+            URLQueryItem(name: "context", value: context)
+        ]
+        var request = URLRequest(url: components.url!)
+        request.setValue(Config.appSharedSecret, forHTTPHeaderField: "x-app-secret")
 
-        guard let reference = try? await photoReference(forPlace: title, context: context) else {
-            await PlacesPhotoCache.shared.store(nil, for: cacheKey)
+        guard let (data, response) = try? await URLSession.shared.data(for: request),
+              let http = response as? HTTPURLResponse, http.statusCode == 200,
+              let decoded = try? JSONDecoder().decode(PlacePhotoResponse.self, from: data),
+              let photoPath = decoded.photoUrl else {
             return nil
         }
-        var components = URLComponents(string: "https://maps.googleapis.com/maps/api/place/photo")!
-        components.queryItems = [
-            URLQueryItem(name: "maxwidth", value: "800"),
-            URLQueryItem(name: "photo_reference", value: reference),
-            URLQueryItem(name: "key", value: Config.googlePlacesAPIKey)
-        ]
-        let url = components.url
-        await PlacesPhotoCache.shared.store(url, for: cacheKey)
-        return url
-    }
 
-    private static func photoReference(forPlace title: String, context: String) async throws -> String? {
-        var components = URLComponents(string: "https://maps.googleapis.com/maps/api/place/textsearch/json")!
-        components.queryItems = [
-            URLQueryItem(name: "query", value: "\(title) \(context)"),
-            URLQueryItem(name: "key", value: Config.googlePlacesAPIKey)
-        ]
-        let (data, response) = try await URLSession.shared.data(from: components.url!)
-        guard let http = response as? HTTPURLResponse, http.statusCode == 200 else {
-            return nil
-        }
-        let decoded = try JSONDecoder().decode(TextSearchResponse.self, from: data)
-        return decoded.results.first?.photos?.first?.photo_reference
+        return URL(string: photoPath, relativeTo: URL(string: Config.backendBaseURL))
     }
-}
-
-private struct TextSearchResponse: Decodable {
-    struct Result: Decodable {
-        struct Photo: Decodable {
-            let photo_reference: String
-        }
-        let photos: [Photo]?
-    }
-    let results: [Result]
 }

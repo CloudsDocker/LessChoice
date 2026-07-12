@@ -11,7 +11,15 @@ struct SuggestedPlace: Decodable {
 
 enum GeminiServiceError: Error {
     case badResponse
-    case emptyContent
+}
+
+private struct SuggestionsRequestBody: Encodable {
+    let prompt: String
+    let constraints: String
+    let likedTitles: [String]
+    let blacklistedTitles: [String]
+    let alreadySuggestedTitles: [String]
+    let count: Int
 }
 
 enum GeminiService {
@@ -21,56 +29,24 @@ enum GeminiService {
                             blacklistedTitles: [String],
                             alreadySuggestedTitles: [String],
                             count: Int) async throws -> [SuggestedPlace] {
-        let instructions = """
-        You are recommending real, specific named places for a trip decision app.
-        Context: \(prompt)
-        Constraints: \(constraints)
-        Suggest \(count) new distinct real places that fit the context and constraints.
-        \(likedTitles.isEmpty ? "" : "The user liked these places, favor a similar style/category/vibe: \(likedTitles.joined(separator: ", ")).")
-        \(blacklistedTitles.isEmpty ? "" : "The user disliked these places, avoid them and anything similar in style or category: \(blacklistedTitles.joined(separator: ", ")).")
-        \(alreadySuggestedTitles.isEmpty ? "" : "Do not repeat any of these already-suggested places: \(alreadySuggestedTitles.joined(separator: ", ")).")
-        For each place, also give the name and a short description in the primary local/native language spoken where that place is located (e.g. for Shanghai, localTitle would be in Chinese characters). If the local language is English, leave localTitle and localDescription as empty strings.
-        Respond with ONLY a JSON array, no markdown fences, in this exact shape:
-        [{"title": "Place Name", "subtitle": "short tagline", "description": "one engaging sentence under 140 characters", "category": "one or two words", "localTitle": "Place name in the local language, or empty string", "localDescription": "one short sentence in the local language, or empty string"}]
-        """
-
-        var request = URLRequest(url: URL(string: "https://generativelanguage.googleapis.com/v1beta/models/gemini-flash-latest:generateContent?key=\(Config.geminiAPIKey)")!)
+        var request = URLRequest(url: URL(string: "\(Config.backendBaseURL)/v1/suggestions")!)
         request.httpMethod = "POST"
         request.setValue("application/json", forHTTPHeaderField: "Content-Type")
+        request.setValue(Config.appSharedSecret, forHTTPHeaderField: "x-app-secret")
 
-        let body: [String: Any] = [
-            "contents": [["parts": [["text": instructions]]]],
-            "generationConfig": [
-                "response_mime_type": "application/json",
-                "thinkingConfig": ["thinkingBudget": 0]
-            ]
-        ]
-        request.httpBody = try JSONSerialization.data(withJSONObject: body)
+        let body = SuggestionsRequestBody(prompt: prompt,
+                                          constraints: constraints,
+                                          likedTitles: likedTitles,
+                                          blacklistedTitles: blacklistedTitles,
+                                          alreadySuggestedTitles: alreadySuggestedTitles,
+                                          count: count)
+        request.httpBody = try JSONEncoder().encode(body)
 
         let (data, response) = try await URLSession.shared.data(for: request)
         guard let http = response as? HTTPURLResponse, http.statusCode == 200 else {
             throw GeminiServiceError.badResponse
         }
 
-        let decoded = try JSONDecoder().decode(GeminiResponse.self, from: data)
-        guard let text = decoded.candidates.first?.content.parts.first?.text,
-              let jsonData = text.data(using: .utf8) else {
-            throw GeminiServiceError.emptyContent
-        }
-
-        return try JSONDecoder().decode([SuggestedPlace].self, from: jsonData)
+        return try JSONDecoder().decode([SuggestedPlace].self, from: data)
     }
-}
-
-private struct GeminiResponse: Decodable {
-    struct Candidate: Decodable {
-        struct Content: Decodable {
-            struct Part: Decodable {
-                let text: String
-            }
-            let parts: [Part]
-        }
-        let content: Content
-    }
-    let candidates: [Candidate]
 }
