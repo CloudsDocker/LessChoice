@@ -445,7 +445,8 @@ struct ShortlistView: View {
     let maybe: [DecisionOption]
     @Environment(\.dismiss) private var dismiss
     @Environment(\.displayScale) private var displayScale
-    @State private var shareItems: [Any]?
+    @State private var shareItems: [Any] = []
+    @State private var isShareSheetPresented = false
     @State private var savedMessage: String?
 
     var body: some View {
@@ -493,11 +494,8 @@ struct ShortlistView: View {
                     .disabled(kept.isEmpty && maybe.isEmpty)
                 }
             }
-            .sheet(item: Binding(
-                get: { shareItems.map(ShareItemsBox.init) },
-                set: { shareItems = $0?.items }
-            )) { box in
-                ActivityShareSheet(items: box.items)
+            .sheet(isPresented: $isShareSheetPresented) {
+                ActivityShareSheet(items: shareItems)
             }
             #endif
         }
@@ -550,12 +548,8 @@ struct ShortlistView: View {
             pdf.closePDF()
         }
         shareItems = [url]
+        isShareSheetPresented = true
     }
-}
-
-private struct ShareItemsBox: Identifiable {
-    let id = UUID()
-    let items: [Any]
 }
 
 struct ContentView_Previews: PreviewProvider {
