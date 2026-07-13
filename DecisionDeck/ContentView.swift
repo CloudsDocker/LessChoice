@@ -169,6 +169,7 @@ struct SetupView: View {
                         .foregroundStyle(.black)
                         .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
                 }
+                .buttonStyle(.plain)
 
                 Button {
                     store.prompt = "Kuala Lumpur from Sydney"
@@ -184,6 +185,7 @@ struct SetupView: View {
                                 .stroke(.white.opacity(0.6), lineWidth: 1)
                         )
                 }
+                .buttonStyle(.plain)
 
                 VStack(alignment: .leading, spacing: 6) {
                     Text("How it works")
@@ -202,6 +204,7 @@ struct SetupView: View {
                         .foregroundStyle(.white.opacity(0.75))
                         .underline()
                 }
+                .buttonStyle(.plain)
                 .frame(maxWidth: .infinity)
                 .padding(.top, 8)
             }
@@ -255,6 +258,7 @@ struct DecisionCardView: View {
                                 .foregroundStyle(.red)
                                 .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
                         }
+                        .buttonStyle(.plain)
 
                         Button {
                             store.makeChoice(.maybe)
@@ -266,6 +270,7 @@ struct DecisionCardView: View {
                                 .foregroundStyle(.orange)
                                 .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
                         }
+                        .buttonStyle(.plain)
 
                         Button {
                             store.makeChoice(.keep)
@@ -277,6 +282,7 @@ struct DecisionCardView: View {
                                 .foregroundStyle(.green)
                                 .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
                         }
+                        .buttonStyle(.plain)
                     }
                 }
             } else {
