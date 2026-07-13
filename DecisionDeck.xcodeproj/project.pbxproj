@@ -163,7 +163,7 @@
 				CODE_SIGN_ENTITLEMENTS = DecisionDeck/DecisionDeck.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 7;
+				CURRENT_PROJECT_VERSION = 8;
 				DEVELOPMENT_TEAM = ZLQUC8CBXW;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_NSPhotoLibraryAddUsageDescription = "DecisionDeck saves your shortlist as an image to your photo library when you tap Save.";
@@ -197,7 +197,7 @@
 				CODE_SIGN_ENTITLEMENTS = DecisionDeck/DecisionDeck.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 7;
+				CURRENT_PROJECT_VERSION = 8;
 				DEVELOPMENT_TEAM = ZLQUC8CBXW;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_NSPhotoLibraryAddUsageDescription = "DecisionDeck saves your shortlist as an image to your photo library when you tap Save.";
