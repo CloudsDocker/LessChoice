@@ -77,7 +77,7 @@ struct AboutView: View {
                 Image(systemName: "sparkles")
                     .font(.system(size: 40))
                     .foregroundStyle(Color.accentColor)
-                Text("DecisionDeck")
+                Text("SelectLess")
                     .font(.title2.bold())
                 VStack(spacing: 6) {
                     Text("Todd Zhang")
@@ -132,7 +132,7 @@ struct SetupView: View {
             ScrollView {
             VStack(alignment: .leading, spacing: 20) {
                 VStack(alignment: .leading, spacing: 8) {
-                    Text("DecisionDeck")
+                    Text("SelectLess")
                         .font(.largeTitle.bold())
                         .foregroundStyle(.white)
                     Text("Turn vague choices into a calm, guided shortlist.")
@@ -403,7 +403,7 @@ struct ShortlistExportView: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: 20) {
-            Text("DecisionDeck Shortlist")
+            Text("SelectLess Shortlist")
                 .font(.title.bold())
 
             if !kept.isEmpty {

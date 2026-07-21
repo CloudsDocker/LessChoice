@@ -2,6 +2,10 @@
 
 DecisionDeck is a polished SwiftUI iPhone app concept for reducing decision fatigue. The app presents options as swipe-style cards, lets the user keep or discard each one, and finishes with a shortlist of the choices that survived the rounds.
 
+## deploy
+https://claude.ai/code/artifact/365391ff-3ccc-473d-8b60-b434df6fa5ed?via=auto_preview
+
+
 ## What this version includes
 - Clean onboarding and setup experience
 - Card-based decision flow with keep/discard actions
