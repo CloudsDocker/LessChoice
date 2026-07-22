@@ -29,25 +29,22 @@ enum GeminiService {
                             blacklistedTitles: [String],
                             alreadySuggestedTitles: [String],
                             count: Int) async throws -> [SuggestedPlace] {
-        var request = URLRequest(url: URL(string: "\(Config.backendBaseURL)/v1/suggestions")!)
-        request.httpMethod = "POST"
-        request.setValue("application/json", forHTTPHeaderField: "Content-Type")
-        request.setValue(Config.appSharedSecret, forHTTPHeaderField: "x-app-secret")
-        if let attestHeaders = await AppAttestService.assertionHeaders() {
-            for (field, value) in attestHeaders {
-                request.setValue(value, forHTTPHeaderField: field)
-            }
-        }
-
         let body = SuggestionsRequestBody(prompt: prompt,
                                           constraints: constraints,
                                           likedTitles: likedTitles,
                                           blacklistedTitles: blacklistedTitles,
                                           alreadySuggestedTitles: alreadySuggestedTitles,
                                           count: count)
-        request.httpBody = try JSONEncoder().encode(body)
+        let httpBody = try JSONEncoder().encode(body)
 
-        let (data, response) = try await BackendClient.dataWithColdStartRetry(for: request)
+        let (data, response) = try await BackendClient.sendAuthenticated {
+            var request = URLRequest(url: URL(string: "\(Config.backendBaseURL)/v1/suggestions")!)
+            request.httpMethod = "POST"
+            request.setValue("application/json", forHTTPHeaderField: "Content-Type")
+            request.setValue(Config.appSharedSecret, forHTTPHeaderField: "x-app-secret")
+            request.httpBody = httpBody
+            return request
+        }
         guard let http = response as? HTTPURLResponse, http.statusCode == 200 else {
             let status = (response as? HTTPURLResponse)?.statusCode ?? -1
             print("GeminiService: suggestions request failed, status=\(status) body=\(String(data: data, encoding: .utf8) ?? "<none>")")

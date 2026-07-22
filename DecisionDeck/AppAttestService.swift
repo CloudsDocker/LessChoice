@@ -106,7 +106,10 @@ enum AppAttestService {
         ]
         request.httpBody = try JSONEncoder().encode(body)
 
-        let (data, response) = try await BackendClient.dataWithColdStartRetry(for: request)
+        // Plain send (no blind cold-start retry): register consumes a single-use
+        // challenge, so a verbatim resend would fail with "challenge already used".
+        // If this fails, the caller's retry loop rebuilds a fresh key + challenge.
+        let (data, response) = try await URLSession.shared.data(for: request)
         guard let http = response as? HTTPURLResponse, http.statusCode == 200 else {
             let status = (response as? HTTPURLResponse)?.statusCode ?? -1
             print("AppAttestService: register failed, status=\(status) body=\(String(data: data, encoding: .utf8) ?? "<none>")")
