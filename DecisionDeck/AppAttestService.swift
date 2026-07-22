@@ -22,22 +22,45 @@ enum AppAttestService {
     /// isn't available (e.g. older devices) — callers should still send the request,
     /// the backend simply won't be able to enforce attestation for it.
     static func assertionHeaders() async -> [String: String]? {
-        guard isSupported else { return nil }
-
-        do {
-            let keyId = try await ensureRegisteredKeyId()
-            let challenge = try await fetchChallenge()
-            let clientDataHash = Data(SHA256.hash(data: Data(challenge.utf8)))
-            let assertion = try await DCAppAttestService.shared.generateAssertion(keyId, clientDataHash: clientDataHash)
-
-            return [
-                "x-key-id": keyId,
-                "x-assertion": assertion.base64EncodedString(),
-                "x-challenge": challenge
-            ]
-        } catch {
+        guard isSupported else {
+            print("AppAttestService: DCAppAttestService.isSupported == false (are we running in Simulator?)")
             return nil
         }
+
+        let maxAttempts = 3
+        for attempt in 1...maxAttempts {
+            do {
+                let keyId = try await ensureRegisteredKeyId()
+                let challenge = try await fetchChallenge()
+                let clientDataHash = Data(SHA256.hash(data: Data(challenge.utf8)))
+                let assertion = try await DCAppAttestService.shared.generateAssertion(keyId, clientDataHash: clientDataHash)
+
+                return [
+                    "x-key-id": keyId,
+                    "x-assertion": assertion.base64EncodedString(),
+                    "x-challenge": challenge
+                ]
+            } catch {
+                print("AppAttestService: attempt \(attempt)/\(maxAttempts) failed to build assertion headers: \(error)")
+
+                let nsError = error as NSError
+                if nsError.domain == "com.apple.devicecheck.error" && nsError.code == 3 {
+                    // DCError.invalidKey: the Secure Enclave no longer recognizes this key
+                    // (e.g. the app was reinstalled under a different App Attest entitlement
+                    // environment — development vs production — which orphans prior keys).
+                    // Our cached key ID is now permanently unusable; drop it so the next
+                    // attempt generates and registers a fresh one instead of repeating the
+                    // same failure.
+                    print("AppAttestService: clearing stale key ID after invalidKey error")
+                    KeychainStore.delete(keyIdKeychainKey)
+                }
+
+                if attempt < maxAttempts {
+                    try? await Task.sleep(nanoseconds: UInt64(attempt) * 1_000_000_000)
+                }
+            }
+        }
+        return nil
     }
 
     private static func ensureRegisteredKeyId() async throws -> String {
@@ -62,6 +85,8 @@ enum AppAttestService {
 
         let (data, response) = try await BackendClient.dataWithColdStartRetry(for: request)
         guard let http = response as? HTTPURLResponse, http.statusCode == 200 else {
+            let status = (response as? HTTPURLResponse)?.statusCode ?? -1
+            print("AppAttestService: challenge fetch failed, status=\(status) body=\(String(data: data, encoding: .utf8) ?? "<none>")")
             throw AppAttestError.backendError
         }
         struct ChallengeResponse: Decodable { let challenge: String }
@@ -81,8 +106,10 @@ enum AppAttestService {
         ]
         request.httpBody = try JSONEncoder().encode(body)
 
-        let (_, response) = try await BackendClient.dataWithColdStartRetry(for: request)
+        let (data, response) = try await BackendClient.dataWithColdStartRetry(for: request)
         guard let http = response as? HTTPURLResponse, http.statusCode == 200 else {
+            let status = (response as? HTTPURLResponse)?.statusCode ?? -1
+            print("AppAttestService: register failed, status=\(status) body=\(String(data: data, encoding: .utf8) ?? "<none>")")
             throw AppAttestError.backendError
         }
     }

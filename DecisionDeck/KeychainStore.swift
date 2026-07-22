@@ -29,4 +29,12 @@ enum KeychainStore {
         attributes[kSecValueData as String] = data
         SecItemAdd(attributes as CFDictionary, nil)
     }
+
+    static func delete(_ key: String) {
+        let query: [String: Any] = [
+            kSecClass as String: kSecClassGenericPassword,
+            kSecAttrAccount as String: key
+        ]
+        SecItemDelete(query as CFDictionary)
+    }
 }

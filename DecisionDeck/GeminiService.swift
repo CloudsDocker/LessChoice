@@ -49,6 +49,8 @@ enum GeminiService {
 
         let (data, response) = try await BackendClient.dataWithColdStartRetry(for: request)
         guard let http = response as? HTTPURLResponse, http.statusCode == 200 else {
+            let status = (response as? HTTPURLResponse)?.statusCode ?? -1
+            print("GeminiService: suggestions request failed, status=\(status) body=\(String(data: data, encoding: .utf8) ?? "<none>")")
             throw GeminiServiceError.badResponse
         }
 
